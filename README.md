@@ -9,7 +9,7 @@
 <p>&nbsp;</p>
 <h2>&bull; MENU</h2>
 <p>class Menu (display, font, title: str = None, per_page: int = 3, y_padding: int = 20, ui_color: int = 53243, bg_color: int = 4421, ui_sound: bool = True, volume: int = 2)</p>
-<p>&nbsp; &nbsp; Discription:</p>
+<p>&nbsp; &nbsp; Description:</p>
 <p style="margin-left: 20px;">&nbsp; &nbsp; The primary menu class.</p>
 <p>&nbsp; &nbsp; Parameters:</p>
 <ul>
