@@ -1,8 +1,7 @@
-from lib import st7789py, keyboard
+from lib import st7789py, keyboard, HydraMenu
 from machine import Pin, SPI, PWM
 from font import vga1_8x16 as small_font
 from font import vga2_16x32 as font
-from apps import HydraMenu
 from lib import microhydra as mh
 
 max_bright = const(65535)
@@ -28,6 +27,8 @@ display = st7789py.ST7789(
 blight = PWM(Pin(38, Pin.OUT))
 blight.freq(1000)
 blight.duty_u16(max_bright)
+
+
 
 import json
 config = {}
@@ -64,15 +65,19 @@ def  save_conf(caller):
         conf.write(json.dumps(config))
     print("save config: ", config)
 
+def change_vol(caller, numb):
+    print(caller.text, numb)
+
 menu.add_item(HydraMenu.RGB_item(menu, "ui_color", ui_rgb, font=small_font, callback=rgb_change))
 menu.add_item(HydraMenu.RGB_item(menu, "bg_color", bg_rgb, font=small_font, callback=rgb_change))
 menu.add_item(HydraMenu.bool_item(menu, "Test 1", test_var, callback=bool_change))
-menu.add_item(HydraMenu.bool_item(menu, "Test 3", True, callback=bool_change))
+menu.add_item(HydraMenu.int_select_item(menu, 0, -10, 10, "Volume", callback=change_vol))
 menu.add_item(HydraMenu.do_item(menu, "save config", callback=save_conf))
 # menu.add_item(HydraMenu.bool_item(menu, "Test 5", True))
 # menu.add_item(HydraMenu.bool_item(menu, "Test 6"))
 # menu.add_item(HydraMenu.bool_item(menu, "Test 7", True))
 # menu.add_item(HydraMenu.bool_item(menu, "Test 8"))
+
 
 menu.display_menu()
 
@@ -84,7 +89,7 @@ def go_up():
     
 def press():
     menu.handle_input("press")
-
+ 
 while True:
     pressed_keys = kb.get_pressed_keys()
     if pressed_keys != prev_pressed_keys:
