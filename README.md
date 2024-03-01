@@ -1,4 +1,4 @@
-<p>This is a very early attempt at a menu library for MicroHydra <a href="https://github.com/echo-lalia/Cardputer-MicroHydra" data-fr-linked="true">https://github.com/echo-lalia/Cardputer-MicroHydra</a></p>
+<p>This is a very early attempt at a menu module for MicroHydra <a href="https://github.com/echo-lalia/Cardputer-MicroHydra" data-fr-linked="true">https://github.com/echo-lalia/Cardputer-MicroHydra</a></p>
 <p>&nbsp;</p>
 <ul>
     <li><a href="https://github.com/Gabriel-F-Sousa/HydraMenu/tree/main?tab=readme-ov-file#-menu">MENU</a></li>
