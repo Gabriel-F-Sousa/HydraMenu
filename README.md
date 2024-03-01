@@ -5,6 +5,7 @@
     <li><a href="https://github.com/Gabriel-F-Sousa/HydraMenu/tree/main?tab=readme-ov-file#-bool_item">bool_item</a></li>
     <li><a href="https://github.com/Gabriel-F-Sousa/HydraMenu/tree/main?tab=readme-ov-file#-rgb_item">RGB_item</a></li>
     <li><a href="https://github.com/Gabriel-F-Sousa/HydraMenu/tree/main?tab=readme-ov-file#-do_item">do_item</a></li>
+    <li><a href="https://github.com/Gabriel-F-Sousa/HydraMenu/tree/main?tab=readme-ov-file#-int_select_item">int_select_item</a></li>
 </ul>
 <p>&nbsp;</p>
 <h2>&bull; MENU</h2>
@@ -76,4 +77,23 @@
         <li>&nbsp; &nbsp; &nbsp;callback (optional): A callable object to be executed when the menu item is activated. Defaults to None.</li>
     </ul>
 </ul>
-<p>&nbsp;</p>
+<p><br></p>
+<h2>&bull; int_select_item</h2>
+<p>&nbsp;class int_select_item (self, menu, init_int, min_int, max_int, text: str = None, x_pos: int = 0, y_pos: int = 0, selected: bool = False, callback: callable = None)</p>
+<p>&nbsp; &nbsp; Description:</p>
+<p style="margin-left: 20px;">&nbsp; &nbsp; This class changes and number.</p>
+<p>&nbsp; &nbsp; Parameters:</p>
+<ul>
+    <ul>
+        <li>&nbsp; &nbsp; &nbsp;menu: The menu object to which the item belongs.</li>
+        <li>&nbsp; &nbsp; &nbsp;init_int: The initial value.</li>
+        <li>&nbsp; &nbsp; &nbsp;min_int: The minimum allowed value.</li>
+        <li>&nbsp; &nbsp; &nbsp;max_int: The maximum allowed value.</li>
+        <li>&nbsp; &nbsp; &nbsp;text (optional): The text to be displayed for the menu item. Defaults to None.</li>
+        <li>&nbsp; &nbsp; &nbsp;x_pos (optional): The x-coordinate position of the menu item. Defaults to 0.</li>
+        <li>&nbsp; &nbsp; &nbsp;y_pos (optional): The y-coordinate position of the menu item. Defaults to 0.</li>
+        <li>&nbsp; &nbsp; &nbsp;selected (optional): Boolean flag indicating whether the menu item is selected. Defaults to False.</li>
+        <li>&nbsp; &nbsp; &nbsp;callback (optional): A callable object to be executed when the menu item is activated. Defaults to None.</li>
+    </ul>
+</ul>
+<p><br></p>
