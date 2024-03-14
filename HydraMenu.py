@@ -89,19 +89,12 @@ class bool_item:
         self.callback = callback        
     
     def draw(self):
-        if self.selected:
-            self.menu.display.text(self.menu.font, '>', 5, self.y_pos, self.menu.ui_color, self.menu.mid_color)
-            self.menu.display.text(self.menu.font, self.text, 20, self.y_pos, self.menu.ui_color, self.menu.mid_color)
-        else:
-            self.menu.display.text(self.menu.font, ' ', 5, self.y_pos, self.menu.ui_color, self.menu.bg_color)
-            self.menu.display.text(self.menu.font, self.text, 20, self.y_pos, self.menu.ui_color, self.menu.bg_color)
-            
-        self.menu.display.fill_rect(int(self.menu.display.width / 2) + 20, self.y_pos, 100, self.menu.font.HEIGHT, self.menu.bg_color)# clear word
-        self.menu.display.text(self.menu.font, str(self.BOOL), int(self.menu.display.width / 2) + 20, self.y_pos, self.menu.ui_color, self.menu.bg_color)
+        draw_left_text(self.menu, self.text, self.menu.font, self.y_pos, self.selected)
+        draw_right_text(self.menu, str(self.BOOL), self.menu.font, self.y_pos)
         self.menu.display.hline(0, self.y_pos, self.menu.display.width, self.menu.mid_color)
 
     def handle_input(self, key):
-        if key == "press":
+        if (key == "press" or key == "ENT"):
             self.BOOL = not self.BOOL
             self.menu.beep.play((("C3","E3","D3"),"D4","C4"), 100, self.menu.volume)
             self.draw()
@@ -124,20 +117,14 @@ class RGB_item:
             self.font = font
         else:
             self.font = self.menu.font
-        pass
 
     def draw(self):
         if self.selected:
-            self.menu.display.text(self.menu.font, '>', 5, self.y_pos, self.menu.ui_color, self.menu.mid_color)
-            self.menu.display.text(self.menu.font, self.text, 20, self.y_pos, self.menu.ui_color, self.menu.mid_color)
+            draw_left_text(self.menu, self.text, self.menu.font, self.y_pos, self.selected)
         else:
-            self.menu.display.text(self.menu.font, ' ', 5, self.y_pos, self.menu.ui_color, self.menu.bg_color)
-            self.menu.display.text(self.menu.font, self.text, 20, self.y_pos, self.menu.ui_color, self.menu.bg_color)
-        
-        self.menu.display.fill_rect(int(self.menu.display.width / 2) + 20, self.y_pos, 100, self.menu.font.HEIGHT, self.menu.bg_color)# clear word
+            draw_left_text(self.menu, self.text, self.menu.font, self.y_pos, self.selected)
         titel = "{},{},{}".format(self.items[0], self.items[1], self.items[2])
-        self.menu.display.text(self.font, str(titel), int(self.menu.display.width / 2) + 25 , self.y_pos + int(self.menu.font.HEIGHT / 4), self.menu.ui_color, self.menu.bg_color)
-        
+        draw_right_text(self.menu, str(titel), self.font, self.y_pos)
         self.menu.display.hline(0, self.y_pos, self.menu.display.width, self.menu.mid_color)
     
     def draw_rgb_win(self):
@@ -146,57 +133,57 @@ class RGB_item:
         color = [63488, 2016, 31]
         rgb_text = ["R/31", "G/63", "B/31"]
         for i, item in enumerate(self.items):
-            x = int(222/2 * (i * 0.5)) + int(222 / 5)
+            x = int(222/2 * (i * 0.5)) + int(222 / 5) #this needs to be looked at
             y = int(20 + self.font.HEIGHT + 5)
             if i == self.cursor_index:
                 self.menu.display.text(self.menu.font, str(item), x, y + self.font.HEIGHT, 16777215, 0)
             else:
                 self.menu.display.text(self.menu.font, str(item), x, y + self.font.HEIGHT, 16777215, self.menu.bg_color)
             self.menu.display.text(self.font, str(rgb_text[i]), x, y, color[i], self.menu.bg_color)
-        
-        # draw pointer
+            
+            # draw pointer
         for i in range(0,16):
             self.menu.display.hline(
                 x = (78 - i) + (44 * self.cursor_index),
                 y = 94 + i,
                 length = 2 + (i*2),
                 color = mh.combine_color565(self.items[0],self.items[1],self.items[2]))
-            self.menu.display.fill_rect(62 + (44 * self. cursor_index), 110, 34, 8, mh.combine_color565(self.items[0],self.items[1],self.items[2]))
+            self.menu.display.fill_rect(62 + (44 * self.cursor_index), 110, 34, 8, mh.combine_color565(self.items[0],self.items[1],self.items[2]))
         
         
     
     def handle_input(self, key):
         max_range = [31, 63, 31]
         self.menu.in_submenu = True
-        if key == 'right':
+        if (key == 'right' or key == "/"):
             self.cursor_index += 1
             if self.menu.ui_sound:
                 self.menu.beep.play(("D3","C3"), 100, self.menu.volume)
             if self.cursor_index >= len(self.items):
                 self.cursor_index = 0
                 
-        elif key == "left":
+        elif (key == "left" or key == ","):
             self.cursor_index -= 1
             if self.menu.ui_sound:
                 self.menu.beep.play(("E3","C3"), 100, self.menu.volume)
             if self.cursor_index < 0:
                 self.cursor_index = len(self.items) - 1
                 
-        elif key == "up":
+        elif (key == "up" or key == ";"):
             self.items[self.cursor_index] += 1
             if self.menu.ui_sound:
                 self.menu.beep.play(("C3","A3"), 80, self.menu.volume)
             if self.items[self.cursor_index] > max_range[self.cursor_index]:
                 self.items[self.cursor_index] = 0
                 
-        elif key == "down":
+        elif (key == "down" or key == "."):
             self.items[self.cursor_index] -= 1
             if self.menu.ui_sound:
                 self.menu.beep.play(("C3","A3"), 80, self.menu.volume)
             if self.items[self.cursor_index] < 0:
                 self.items[self.cursor_index] = max_range[self.cursor_index]
                 
-        elif key == "press" and self.in_item != False:
+        elif (key == "press" or key == "ENT") and self.in_item != False:
             self.menu.in_submenu = False
             self.in_item = False
             self.menu.display_menu()
@@ -243,13 +230,8 @@ class int_select_item:
         self.callback = callback
     
     def draw(self):
-        if self.selected:
-            self.menu.display.text(self.menu.font, '>', 5, self.y_pos, self.menu.ui_color, self.menu.mid_color)
-            self.menu.display.text(self.menu.font, self.text, 20, self.y_pos, self.menu.ui_color, self.menu.mid_color)
-        else:
-            self.menu.display.text(self.menu.font, ' ', 5, self.y_pos, self.menu.ui_color, self.menu.bg_color)
-            self.menu.display.text(self.menu.font, self.text, 20, self.y_pos, self.menu.ui_color, self.menu.bg_color)
-        self.menu.display.text(self.menu.font, str(self.current_value), int(self.menu.display.width / 2) + 20, self.y_pos, self.menu.ui_color, self.menu.bg_color)
+        draw_left_text(self.menu, self.text, self.menu.font, self.y_pos, self.selected)
+        draw_right_text(self.menu, str(self.current_value), self.menu.font, self.y_pos)
     
     def draw_win(self):
         win = pop_up_win(self.menu.display, self.text, self.menu.ui_color, self.menu.bg_color, self.menu.font)
@@ -272,21 +254,21 @@ class int_select_item:
     
     def handle_input(self, key):
         self.menu.in_submenu = True
-        if key == "up":
+        if (key == "up" or key == ";"):
             self.current_value += 1
             if self.menu.ui_sound:
                 self.menu.beep.play(("C3","A3"), 80, self.menu.volume)
             if self.current_value > self.max_int:
                 self.current_value = self.min_int
                 
-        elif key == "down":
+        elif (key == "down" or key == "."):
             self.current_value -= 1
             if self.menu.ui_sound:
                 self.menu.beep.play(("C3","A3"), 80, self.menu.volume)
             if self.current_value < self.min_int:
                 self.current_value = self.max_int
                 
-        elif key == "press" and self.in_item != False:
+        elif (key == "press" or key == "ENT") and self.in_item != False:
             self.menu.in_submenu = False
             self.in_item = False
             self.menu.display_menu()
@@ -297,7 +279,55 @@ class int_select_item:
             
         self.in_item = True
         self.draw_win()
-        pass
+
+class write_item:
+    def __init__(self, menu, text: str = None, show_text: str = None, hide: bool = False, x_pos: int = 0, y_pos: int = 0, font = None, selected: bool = False, callback: callable = None):
+        self.menu = menu
+        self.text = text
+        self.show_text = show_text
+        self.hide = hide
+        self.selected = selected
+        self.x_pos = x_pos
+        self.y_pos = y_pos
+        self.in_item = False
+        self.callback = callback
+        if font:
+            self.font = font
+        else:
+            self.font = self.menu.font
+    
+    def draw(self):
+        draw_left_text(self.menu, self.text, self.menu.font, self.y_pos, self.selected)    
+        if self.hide:
+            draw_right_text(self.menu, str("****"), self.font, self.y_pos)
+        else:
+            draw_right_text(self.menu, str(self.show_text), self.font, self.y_pos)     
+
+    def draw_win(self):
+        win = pop_up_win(self.menu.display, self.text, self.menu.ui_color, self.menu.bg_color, self.menu.font)
+        win.draw()
+        draw_text_on_win(self.menu, self.show_text, self.menu.font, 75)
+    
+    def handle_input(self, key):
+        self.menu.in_submenu = True
+        if (key == "press" or key == "ENT") and self.in_item != False:
+            self.menu.in_submenu = False
+            self.in_item = False
+            self.menu.display_menu()
+            if self.callback != None:
+                self.callback(self, self.show_text)
+                self.menu.beep.play(("C4","D4","E4"), 50, self.menu.volume)
+            return
+        
+        elif key == "SPC":
+            self.show_text += " "
+        elif len(key) == 1:
+            self.show_text += str(key)
+        elif key == "BSPC":
+            self.show_text = self.show_text[:-1]
+        self.in_item = True
+        self.draw_win()
+
 
 class pop_up_win:
     def __init__(self, display, text: str = None, ui_color: int = 53243, bg_color: int = 4421, font = None):
@@ -306,7 +336,6 @@ class pop_up_win:
         self.ui_color = ui_color
         self.bg_color = bg_color
         self.font = font
-        pass
     
     def draw(self):
         self.display.fill_rect(10, 10, 220, 115, self.bg_color)
@@ -326,3 +355,29 @@ class pop_up_win:
 def get_text_center(text:str, font):
     center = int((len(text) * font.WIDTH) // 2)
     return (center)
+
+def draw_left_text(menu, text:str, font, y_pos:int, selected):
+    if selected:
+        menu.display.text(menu.font, '>', 0, y_pos, menu.ui_color, menu.mid_color)
+        menu.display.text(menu.font, text, 15, y_pos, menu.ui_color, menu.mid_color)
+    else:
+        menu.display.text(menu.font, ' ', 0, y_pos, menu.ui_color, menu.bg_color)
+        menu.display.text(menu.font, text, 15, y_pos, menu.ui_color, menu.bg_color)
+
+def draw_right_text(menu, text:str, font, y_pos:int):
+    menu.display.fill_rect(160, y_pos, 80, menu.font.HEIGHT, menu.bg_color)# clear word
+    x = menu.display.width - 40 - get_text_center(text, font)
+    color = mh.mix_color565(menu.ui_color, menu.bg_color)
+    if len(text) * font.WIDTH > 80:
+         x = (int(menu.display.width / 2) + 40)
+    if font.HEIGHT < menu.font.HEIGHT:
+        menu.display.text(font, str(text), x, int(y_pos + (font.HEIGHT / 2)), color, menu.bg_color)
+    else:
+        menu.display.text(font, str(text), x, y_pos, color, menu.bg_color)
+
+def draw_text_on_win(menu, text:str, font, y_pos:int):
+    if len(text) > int(222 / font.WIDTH):
+        menu.display.text(menu.font, text[0:int(222 / font.WIDTH)], int(menu.display.width / 2) - get_text_center(text[0:int(222 / font.WIDTH)], menu.font), 85-font.HEIGHT, menu.ui_color, menu.bg_color)
+        menu.display.text(menu.font, text[int(222 / font.WIDTH):len(text)], int(menu.display.width / 2) - get_text_center(text[int(222 / font.WIDTH):len(text)], menu.font), 85, menu.ui_color, menu.bg_color)
+    else:
+        menu.display.text(menu.font, text, int(menu.display.width / 2) - get_text_center(text, menu.font), 75, menu.ui_color, menu.bg_color)
