@@ -36,7 +36,7 @@ with open("config.json", "r") as conf:
     config = json.loads(conf.read())
     bg_color = config["bg_color"]
     ui_color = config["ui_color"]
-#     menu = HydraMenu.Menu(display, small_font, "Main Menu", 5, y_padding=0, bg_color=bg_color, ui_color=ui_color)
+#     menu = HydraMenu.Menu(display, small_font, "Main Menu", 8, y_padding=0, bg_color=bg_color, ui_color=ui_color)
     menu = HydraMenu.Menu(display, font, "Main Menu", 4, y_padding=0, bg_color=bg_color, ui_color=ui_color)
 
 test_var = False
@@ -59,24 +59,40 @@ def bool_change(caller, BOOL):
         test_var = BOOL
         print(caller.text, BOOL)
 
+def change_vol(caller, numb):
+    global config
+    config["volume"] = numb
+    print(caller.text, numb)
+    
+def change_ssd(caller, text):
+    global config
+    config["wifi_ssid"] = text
+    print(caller.text, text)
+    
+def change_wifi_pass(caller, text):
+    global config
+    config["wifi_pass"] = text
+    print(caller.text, text)
+
+def change_timezone(caller, numb):
+    global config
+    config["timezone"] = numb
+    print(caller.text, numb)
+
 def  save_conf(caller):
     global config
     with open("config.json", "w") as conf:
         conf.write(json.dumps(config))
     print("save config: ", config)
 
-def change_vol(caller, numb):
-    print(caller.text, numb)
-
+menu.add_item(HydraMenu.int_select_item(menu, config["volume"], 0, 10, "volume", callback=change_vol))
 menu.add_item(HydraMenu.RGB_item(menu, "ui_color", ui_rgb, font=small_font, callback=rgb_change))
 menu.add_item(HydraMenu.RGB_item(menu, "bg_color", bg_rgb, font=small_font, callback=rgb_change))
-menu.add_item(HydraMenu.bool_item(menu, "Test 1", test_var, callback=bool_change))
-menu.add_item(HydraMenu.int_select_item(menu, 0, -10, 10, "Volume", callback=change_vol))
-menu.add_item(HydraMenu.do_item(menu, "save config", callback=save_conf))
-# menu.add_item(HydraMenu.bool_item(menu, "Test 5", True))
-# menu.add_item(HydraMenu.bool_item(menu, "Test 6"))
-# menu.add_item(HydraMenu.bool_item(menu, "Test 7", True))
-# menu.add_item(HydraMenu.bool_item(menu, "Test 8"))
+menu.add_item(HydraMenu.write_item(menu, "wifi_ssid", config["wifi_ssid"], font=small_font, callback=change_ssd))
+menu.add_item(HydraMenu.write_item(menu, "wifi_pass", config["wifi_pass"], hide=True, font=small_font, callback=change_wifi_pass))
+menu.add_item(HydraMenu.bool_item(menu, "sync_clock", config["sync_clock"], callback=bool_change))
+menu.add_item(HydraMenu.int_select_item(menu, config["timezone"], -13, 13, "timezone", callback=change_timezone))
+menu.add_item(HydraMenu.do_item(menu, "confirm", callback=save_conf))
 
 
 menu.display_menu()
@@ -92,8 +108,12 @@ def press():
  
 while True:
     pressed_keys = kb.get_pressed_keys()
+    
     if pressed_keys != prev_pressed_keys:
-        if ";" in pressed_keys and ";" not in prev_pressed_keys:
+        if menu.in_submenu and len(pressed_keys) > 0 and pressed_keys[-1] not in prev_pressed_keys:
+            menu.handle_input(pressed_keys[-1])
+            prev_pressed_keys = pressed_keys
+        elif ";" in pressed_keys and ";" not in prev_pressed_keys:
             go_up()
             prev_pressed_keys = pressed_keys
         elif "." in pressed_keys and "." not in prev_pressed_keys:
@@ -106,4 +126,18 @@ while True:
         elif "ENT" in pressed_keys and "ENT" not in prev_pressed_keys:
             press()
             prev_pressed_keys = pressed_keys
+        
+            
         prev_pressed_keys = pressed_keys
+#     print(prev_pressed_keys)
+
+
+
+
+
+
+
+
+
+
+
