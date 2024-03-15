@@ -106,7 +106,8 @@ def go_up():
     
 def press():
     menu.handle_input("press")
- 
+
+display.show()
 while True:
     pressed_keys = kb.get_pressed_keys()
     
