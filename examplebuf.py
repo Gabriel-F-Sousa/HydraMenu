@@ -1,4 +1,4 @@
-from lib import st7789fbuf, keyboard
+from lib import st7789fbuf, keyboard, mhconfig
 import HydraMenubuf as HydraMenu
 from machine import Pin, SPI, PWM
 from font import vga1_8x16 as small_font
@@ -12,6 +12,7 @@ bright_step = const(500)
 kb = keyboard.KeyBoard()
 pressed_keys = kb.get_pressed_keys()
 prev_pressed_keys = pressed_keys
+config = mhconfig.Config()
 
 display = st7789fbuf.ST7789(
     SPI(1, baudrate=40000000, sck=Pin(36), mosi=Pin(35), miso=None),
@@ -30,24 +31,16 @@ blight.freq(1000)
 blight.duty_u16(max_bright)
 
 
-
-import json
-config = {}
 with open("config.json", "r") as conf:
-    config = json.loads(conf.read())
-    bg_color = config["bg_color"]
-    ui_color = config["ui_color"]
 #     menu = HydraMenu.Menu(display, small_font, "Main Menu", 8, y_padding=0, bg_color=bg_color, ui_color=ui_color)
-    menu = HydraMenu.Menu(display, font, "Main Menu", 4, y_padding=0, bg_color=bg_color, ui_color=ui_color)
+    menu = HydraMenu.Menu(display, font, "Main Menu", 4, y_padding=0, bg_color=config["bg_color"], ui_color=config["ui_color"])
 
-test_var = False
-r,g,b = mh.separate_color565(bg_color)
+r,g,b = mh.separate_color565(config["bg_color"])
 bg_rgb = [r,g,b]
-r,g,b = mh.separate_color565(ui_color)
+r,g,b = mh.separate_color565(config["ui_color"])
 ui_rgb = [r,g,b]
 
 def rgb_change(caller, rgb: list):
-    global config
     color = mh.combine_color565(rgb[0],rgb[1],rgb[2])
     if caller.text == "ui_color":
         config["ui_color"] = color
@@ -55,35 +48,28 @@ def rgb_change(caller, rgb: list):
         config["bg_color"] = color
     print(caller.text, color)
 
-def bool_change(caller, BOOL):
-    if caller.text == "Test 1":
-        test_var = BOOL
-        print(caller.text, BOOL)
+def sync_clock(caller, BOOL):
+    config["sync_clock"] = BOOL
+    print(caller.text, BOOL)
 
 def change_vol(caller, numb):
-    global config
     config["volume"] = numb
     print(caller.text, numb)
     
 def change_ssd(caller, text):
-    global config
     config["wifi_ssid"] = text
     print(caller.text, text)
     
 def change_wifi_pass(caller, text):
-    global config
     config["wifi_pass"] = text
     print(caller.text, text)
 
 def change_timezone(caller, numb):
-    global config
     config["timezone"] = numb
     print(caller.text, numb)
 
 def  save_conf(caller):
-    global config
-    with open("config.json", "w") as conf:
-        conf.write(json.dumps(config))
+    config.save()
     print("save config: ", config)
 
 menu.add_item(HydraMenu.int_select_item(menu, config["volume"], 0, 10, "volume", callback=change_vol))
@@ -91,10 +77,9 @@ menu.add_item(HydraMenu.RGB_item(menu, "ui_color", ui_rgb, font=small_font, call
 menu.add_item(HydraMenu.RGB_item(menu, "bg_color", bg_rgb, font=small_font, callback=rgb_change))
 menu.add_item(HydraMenu.write_item(menu, "wifi_ssid", config["wifi_ssid"], font=small_font, callback=change_ssd))
 menu.add_item(HydraMenu.write_item(menu, "wifi_pass", config["wifi_pass"], hide=True, font=small_font, callback=change_wifi_pass))
-menu.add_item(HydraMenu.bool_item(menu, "sync_clock", config["sync_clock"], callback=bool_change))
+menu.add_item(HydraMenu.bool_item(menu, "sync_clock", config["sync_clock"], callback=sync_clock))
 menu.add_item(HydraMenu.int_select_item(menu, config["timezone"], -13, 13, "timezone", callback=change_timezone))
 menu.add_item(HydraMenu.do_item(menu, "confirm", callback=save_conf))
-
 
 menu.display_menu()
 
@@ -131,15 +116,5 @@ while True:
         
         display.show()  
         prev_pressed_keys = pressed_keys
-#     print(prev_pressed_keys)
-
-
-
-
-
-
-
-
-
 
 
